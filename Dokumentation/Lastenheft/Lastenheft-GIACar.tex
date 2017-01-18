@@ -1,0 +1,90 @@
+\documentclass[12pt,a4paper]{letter} 
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{longtable}
+\usepackage{multirow}
+\renewcommand{\familydefault}{\sfdefault}
+\usepackage{droid}
+\usepackage[left=2cm, right=2cm, top=1cm, bottom=2cm]{geometry}
+\usepackage{ngerman}
+\usepackage{tabularx}
+\usepackage{graphicx}
+\usepackage{enumitem}
+\usepackage{scrpage2}	%Kopf- und Fußzeile
+\usepackage{picinpar}	%Textumläufe von Grafiken
+\usepackage{pdfpages}	%Implementierung von pdf als ganze Seite(Seiten sind nicht editierbar)
+\usepackage{lastpage}	%Implmentiert 'letzte Seite', wird für Kopfzeile benötigt
+\usepackage{listings}
+\usepackage{tikz}
+\usepackage{wasysym}  
+
+
+\usepackage{lastpage}
+
+
+
+
+\pagestyle{scrheadings}
+
+\ifoot{\ \copyright Noah Kofort, Klaus Suthe - v0.1} \setfootsepline{1pt}\ofoot{ \thepage \  von \pageref{LastPage}\ }
+
+
+
+\begin{document}
+
+\raggedleft\includegraphics[height=1.5cm]{images/hbbk-logo.png}
+\\
+\begin{tabular}{p{4cm} p{5cm} p{1.5cm} p{1.5cm} p{3cm}}
+  \tabularnewline
+  \textbf{GK Informatik} & \textbf{Projekt GIACar}    & GIA3    &  & {\today} \tabularnewline 
+  \hline
+\end{tabular}
+%}
+
+
+
+
+
+\centering
+\includegraphics[width=0.7\linewidth]{./images/GIAcar}
+
+
+\centering\Huge{Lastenheft} \\
+
+
+\normalsize
+\begin{itemize}
+
+\item Fahrzeugverwaltung:
+\begin{itemize}
+\item Fahrzeuge hinzufügen, löschen, modifizieren, lokalisieren, allgemeine Informationen, Preis, Bilder
+\item Bewertungssystem
+\end{itemize}
+\item Verkauf: 
+\begin{itemize}
+\item Angebote
+\item Aktionen und Angebotskampagnen  erstellen
+\item Versteigerungssystem
+\item Kundenverwaltung mit der Möglichkeit, Angebote für den Kunden zu finden und ihm per Klick anzubieten.
+\item Angebot auf der Grundlage des letzten Kaufs $\rightarrow$ z.B.: Angebot eines neuen Wagens, wenn der letzte ein bestimmtes Alter erreicht hat.
+\end{itemize}
+\item Kundenportal: 
+\begin{itemize}
+\item Übersichtlich, Such- und Filterfunktion, Kontaktdaten
+\item Individualisierte Startseite
+
+\end{itemize}
+\item Kunden und Sachbearbeiterverwaltung
+\item Impressum, rechtliche Informationen, Nutzungsbedingungen/allgemeine Geschäftsbedingungen
+\item Dokumentation, Installation und Einweisung
+
+\end{itemize}
+
+
+
+
+
+\end{document}

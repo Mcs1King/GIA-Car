@@ -1,0 +1,5 @@
+# LaTeX - nur pdf und tex Dokumente
+*.aux
+*.log
+*.gz
+*.out
