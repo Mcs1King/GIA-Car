@@ -1,0 +1,74 @@
+\documentclass[11pt,a4paper]{letter} 
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{longtable}
+\usepackage{multirow}
+\renewcommand{\familydefault}{\sfdefault}
+\usepackage{droid}
+\usepackage[left=2cm, right=2cm, top=1cm, bottom=2cm]{geometry}
+\usepackage{ngerman}
+\usepackage{tabularx}
+\usepackage{graphicx}
+\usepackage{enumitem}
+\usepackage{scrpage2}	%Kopf- und Fußzeile
+\usepackage{picinpar}	%Textumläufe von Grafiken
+\usepackage{pdfpages}	%Implementierung von pdf als ganze Seite(Seiten sind nicht editierbar)
+\usepackage{lastpage}	%Implmentiert 'letzte Seite', wird für Kopfzeile benötigt
+\usepackage{listings}
+
+
+\usepackage{lastpage}
+
+
+
+
+\pagestyle{scrheadings}
+
+
+\ifoot{\ \copyright Noah Kofort, Klaus Suthe - v0.1} \setfootsepline{1pt}\ofoot{ \thepage \  von \pageref{LastPage}\ }
+
+\begin{document}
+
+\raggedleft\includegraphics[height=1.5cm]{images/hbbk-logo.png}
+\\
+\begin{tabular}{p{4cm} p{5cm} p{1.5cm} p{1.5cm} p{3cm}}
+  \tabularnewline
+%  \textbf{Fach:} & Klasse:  & Lehrkraft:  & Datum:     \tabularnewline
+  \textbf{GK Informatik} & \textbf{Projekt GIACar}    & GIA3    &  & {\today} \tabularnewline 
+  \hline
+\end{tabular}
+
+
+
+
+
+
+\centering
+\includegraphics[width=0.7\linewidth]{./images/GIAcar}
+
+
+\centering\Huge{Pflichtenheft} \\
+
+
+\normalsize
+\begin{itemize}
+
+\item Zuständigkeiten
+\begin{itemize}
+\item \textbf{Aktivitätsdiagramm, UseCase, Sequenzdiagramm:} Carlo, Sebastian, Martin
+\item \textbf{OnlinePortale zum Projektmanagment Trello:} Bjarne, Timo, Quang
+\item \textbf{Versionsmanagement github:} Benedikt, Max, Noah
+\item \textbf{Scrum:} Daniel, Simon
+\end{itemize}
+
+
+\end{itemize}
+
+
+
+
+
+\end{document}
