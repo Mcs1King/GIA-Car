@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: 127.0.0.1
--- Erstellungszeit: 26. Jan 2017 um 10:26
+-- Erstellungszeit: 01. Feb 2017 um 12:32
 -- Server Version: 5.6.11
 -- PHP-Version: 5.5.1
 
@@ -17,10 +17,23 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8 */;
 
 --
--- Datenbank: `gia_car`
+-- Datenbank: `gia_car_new`
 --
-CREATE DATABASE IF NOT EXISTS `gia_car` DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci;
-USE `gia_car`;
+CREATE DATABASE IF NOT EXISTS `gia_car_new` DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci;
+USE `gia_car_new`;
+
+-- --------------------------------------------------------
+
+--
+-- Tabellenstruktur für Tabelle `tab_ausstattung`
+--
+
+CREATE TABLE IF NOT EXISTS `tab_ausstattung` (
+  `AutoNr` int(11) DEFAULT NULL,
+  `AusstattungsNr` int(11) DEFAULT NULL,
+  KEY `AutoNr` (`AutoNr`),
+  KEY `AusstattungsNr` (`AusstattungsNr`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -40,6 +53,31 @@ CREATE TABLE IF NOT EXISTS `tab_auto` (
 -- --------------------------------------------------------
 
 --
+-- Tabellenstruktur für Tabelle `tab_auto_mangel`
+--
+
+CREATE TABLE IF NOT EXISTS `tab_auto_mangel` (
+  `MangelNr` int(11) DEFAULT NULL,
+  `AutoNr` int(11) DEFAULT NULL,
+  KEY `MangelNr` (`MangelNr`),
+  KEY `AutoNr` (`AutoNr`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Tabellenstruktur für Tabelle `tab_extra`
+--
+
+CREATE TABLE IF NOT EXISTS `tab_extra` (
+  `Ausstattungsnr` int(11) NOT NULL,
+  `Ausstattung` varchar(50) DEFAULT NULL,
+  PRIMARY KEY (`Ausstattungsnr`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
 -- Tabellenstruktur für Tabelle `tab_klasse`
 --
 
@@ -52,17 +90,14 @@ CREATE TABLE IF NOT EXISTS `tab_klasse` (
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `tab_kunde`
+-- Tabellenstruktur für Tabelle `tab_mangel`
 --
 
-CREATE TABLE IF NOT EXISTS `tab_kunde` (
-  `KundenNr` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `Vorname` varchar(45) COLLATE latin1_general_ci NOT NULL,
-  `Nachname` varchar(45) COLLATE latin1_general_ci NOT NULL,
-  `PLZ` varchar(5) COLLATE latin1_general_ci NOT NULL,
-  PRIMARY KEY (`KundenNr`),
-  KEY `PLZ` (`PLZ`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_general_ci AUTO_INCREMENT=1 ;
+CREATE TABLE IF NOT EXISTS `tab_mangel` (
+  `MangelNr` int(11) NOT NULL,
+  `Mangel` varchar(50) DEFAULT NULL,
+  PRIMARY KEY (`MangelNr`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -8380,9 +8415,34 @@ CREATE TABLE IF NOT EXISTS `tab_typ` (
   KEY `MarkenNr` (`MarkenNr`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
+-- --------------------------------------------------------
+
+--
+-- Tabellenstruktur für Tabelle `tab_user`
+--
+
+CREATE TABLE IF NOT EXISTS `tab_user` (
+  `Benutzername` varchar(50) COLLATE latin1_general_ci NOT NULL,
+  `Passwort` varchar(256) COLLATE latin1_general_ci DEFAULT NULL,
+  `Vorname` varchar(50) COLLATE latin1_general_ci DEFAULT NULL,
+  `Nachname` varchar(50) COLLATE latin1_general_ci DEFAULT NULL,
+  `Adresse` varchar(50) COLLATE latin1_general_ci DEFAULT NULL,
+  `job` varchar(50) COLLATE latin1_general_ci DEFAULT NULL,
+  `PLZ` char(5) COLLATE latin1_general_ci DEFAULT NULL,
+  PRIMARY KEY (`Benutzername`),
+  KEY `PLZ` (`PLZ`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_general_ci;
+
 --
 -- Constraints der exportierten Tabellen
 --
+
+--
+-- Constraints der Tabelle `tab_ausstattung`
+--
+ALTER TABLE `tab_ausstattung`
+  ADD CONSTRAINT `tab_ausstattung_ibfk_1` FOREIGN KEY (`AutoNr`) REFERENCES `tab_auto` (`autonr`),
+  ADD CONSTRAINT `tab_ausstattung_ibfk_2` FOREIGN KEY (`AusstattungsNr`) REFERENCES `tab_extra` (`Ausstattungsnr`);
 
 --
 -- Constraints der Tabelle `tab_auto`
@@ -8392,11 +8452,11 @@ ALTER TABLE `tab_auto`
   ADD CONSTRAINT `tab_auto_ibfk_2` FOREIGN KEY (`TypNr`) REFERENCES `tab_typ` (`typNr`);
 
 --
--- Constraints der Tabelle `tab_kunde`
+-- Constraints der Tabelle `tab_auto_mangel`
 --
-ALTER TABLE `tab_kunde`
-  ADD CONSTRAINT `tab_kunde_ibfk_1` FOREIGN KEY (`PLZ`) REFERENCES `tab_ort` (`PLZ`),
-  ADD CONSTRAINT `tab_kunde_ibfk_2` FOREIGN KEY (`PLZ`) REFERENCES `tab_ort` (`PLZ`);
+ALTER TABLE `tab_auto_mangel`
+  ADD CONSTRAINT `tab_auto_mangel_ibfk_1` FOREIGN KEY (`MangelNr`) REFERENCES `tab_mangel` (`MangelNr`),
+  ADD CONSTRAINT `tab_auto_mangel_ibfk_2` FOREIGN KEY (`AutoNr`) REFERENCES `tab_auto` (`autonr`);
 
 --
 -- Constraints der Tabelle `tab_typ`
@@ -8404,6 +8464,12 @@ ALTER TABLE `tab_kunde`
 ALTER TABLE `tab_typ`
   ADD CONSTRAINT `tab_typ_ibfk_1` FOREIGN KEY (`KlassenNr`) REFERENCES `tab_klasse` (`KlassenNr`),
   ADD CONSTRAINT `tab_typ_ibfk_2` FOREIGN KEY (`MarkenNr`) REFERENCES `tab_marke` (`MarkenNr`);
+
+--
+-- Constraints der Tabelle `tab_user`
+--
+ALTER TABLE `tab_user`
+  ADD CONSTRAINT `tab_user_ibfk_1` FOREIGN KEY (`PLZ`) REFERENCES `tab_ort` (`PLZ`);
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
