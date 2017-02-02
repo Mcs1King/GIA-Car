@@ -1,39 +1,65 @@
 <?php
-  /******************************************************************************************
+  /**************************************************************************************************************************************
                                             OVERVIEW
-   ------------------------------------------------------------------------------------------
+   --------------------------------------------------------------------------------------------------------------------------------------
     Datenbank Verbindungs Funktion
-   ------------------------------------------------------------------------------------------
+   --------------------------------------------------------------------------------------------------------------------------------------
       - connect()
       - sendToDatabase(command)
-   ------------------------------------------------------------------------------------------
+      - getIdOfLastInserted()
+   --------------------------------------------------------------------------------------------------------------------------------------
     USER-MANAGEMENT FUNKTIONEN
-   ------------------------------------------------------------------------------------------
+   --------------------------------------------------------------------------------------------------------------------------------------
       - createUser(Benutzername,Passwort,Vorname,Nachname,PLZ,Adresse,Job)
       - login(Benutzername,Passwort)
       - isLoggedIn()
-   ------------------------------------------------------------------------------------------
+   --------------------------------------------------------------------------------------------------------------------------------------
     FUNKTIONEN ZUM HINZUFUEGEN IN DIE DATENBANK
-   ------------------------------------------------------------------------------------------
+   --------------------------------------------------------------------------------------------------------------------------------------
       - addExtra(Ausstattung)
       - addMangel(Mangel)
-   ------------------------------------------------------------------------------------------
+      - addMotor(Motor)
+      - addMarke(Marke)
+      - addKlasse(Klasse)
+      - addTyp(Typ,KlassenNr,MarkenNr)
+      - addOrt(PLZ,Ort)
+      - addAuto(TypNr,Farbe,Kurzbeschreibung,Detailbeschreibung,StellplatzNr,Baujahr,Leistung,KMLaufleistung,MangelArray,ExtrasArray,MotorenArray)
+      - addBild(AutoNr, Bildpfad)
+   --------------------------------------------------------------------------------------------------------------------------------------
     SETTER
-   ------------------------------------------------------------------------------------------
+   --------------------------------------------------------------------------------------------------------------------------------------
       - setMangel(AutoNr,MangelNr)
       - setStellplatz(AutoNr,StellplatzNr)
       - setAusstattung(AutoNr,AusstattungsNr)
-   ------------------------------------------------------------------------------------------
+      - setMotoren(AutoNr,MotorenNr)
+      - setFarbe(AutoNr,Farbe)
+      - setKurbeschreibung(AutoNr,Kurzbeschreibung)
+      - setDetailbeschreibung(AutoNr,Detailbeschreibung)
+      - setKMLaufleistung(AutoNr,KMLaufleistung)
+      - setLeistung(AutoNr,Leistung)
+      - setBaujahr(AutoNr,Baujahr)
+   --------------------------------------------------------------------------------------------------------------------------------------
     GET ABFRAGEN
-   ------------------------------------------------------------------------------------------
+   --------------------------------------------------------------------------------------------------------------------------------------
       - getMarken()
       - getExtras()
       - getStellplaetze()
       - getKlassen()
       - getTypen()
-   ------------------------------------------------------------------------------------------
+      - getMotoren()
+   --------------------------------------------------------------------------------------------------------------------------------------
+    DELETE
+   --------------------------------------------------------------------------------------------------------------------------------------
+      - deleteBild(BildNr)
+      - deleteStellplatz(StellplatzNr)
+      - deleteMangel(MangelNr)
+      - deleteAusstattung(AusstattungsNr)
+      - deleteMotorArt(MotorNr)
+      - deleteMarke(MarkenNr)
+      - deleteKlasse(KlassenNr)
+   --------------------------------------------------------------------------------------------------------------------------------------
     CONVERTER
-   ------------------------------------------------------------------------------------------
+   --------------------------------------------------------------------------------------------------------------------------------------
       - PLZToOrt(PLZ)
       - StellplatzNrToStellplatz(StellplatzNr)
       - ExtraNrToExtra(ExtraNr)
@@ -43,162 +69,288 @@
       - AutoNrToBilder(AutoNr)
       - AutoNrToAuto(AutoNr)
       - BenutzernameToWatchlist(Benutzername)
-  ******************************************************************************************/
+      - AutoNrToExtras(AutoNr)
+      - AutoNrToMangel(AutoNr)
+      - AutoNrToMotor(AutoNr)
+  **************************************************************************************************************************************/
+
   session_start();
+
   /******************************************************
              DATENBANK VERBINDUNGS FUNKTIONEN
   ******************************************************/
+
   function connect(){
-     $host = "";
-     $user = "";
-     $pass = "";
-     $database = "";
-     $con = mysqli_connect($host,$user,$pass,$database);
-     if(!$con)
-        die("Fehler beim verbinden mit der Datenbank");
-     return $con;
+    $host = "";
+    $user = "";
+    $pass = "";
+    $database = "";
+    $con = mysqli_connect($host,$user,$pass,$database);
+    if(!$con){
+      errorHappend(mysqli_error($con));
+      die("Fehler beim verbinden mit der Datenbank");
+    }
+    return $con;
   }
   
   function sendToDatabase($commmand){
     $con = connect();
     $result = mysqli_query($con,$command);
+    if(!$result)
+      errorHappend(mysqli_error($con));
     return $result;
   }
+
+  function getIdOfLastInserted(){
+    $con = connect();
+    return mysqli_insert_id($con);
+  }
+
   /******************************************************
                 USER-MANAGEMENT FUNKTIONEN
   ******************************************************/
   
   function createUser($Benutzername,$Passwort,$Email,$Vorname,$Nachname,$PLZ,$Adresse,$Job){
-    $Passwort = password_hash($Passwort);
 	  $sql = "insert into tab_user(Benutzername,Passwort,email,Vorname,Nachname,plz,adresse,job)
-			values('".$Benutzername."','".$Passwort."','".$Email."','".$Vorname."','".$Nachname."',
+			values('".$Benutzername."','".password_hash($Passwort)."','".$Email."','".$Vorname."','".$Nachname."',
 			'".$PLZ."','".$Adresse."','".$Job."')";
-    $createdUser = sendToDatabase($sql);
-    if(!$createdUser) return false;
-    return true;
+    return sqlInsertOrUpdate($sql);
   }
   
   function login($Benutzername,$Passwort){
     $sql = "select Passwort,vorname,nachname,plz,adresse,job,Email from tab_User where Benutzername like '".$Benutzername."'";
-    $_UserProfile = sendToDatabase($sql);
-    $UserProfile = mysqli_fetch_array($_UserProfile);
-    $Pass = $UserProfile[0];
-    if(password_verify($Passwort,$Pass){
-      $Person = array (
-        "Benutzername" => $Benutzername,
-        "Vorname" => $UserProfile[1],
-        "Nachname" => $UserProfile[2],
-        "PLZ" => $UserProfile[3],
-        "Adresse" => $UserProfile[4],
-        "Job" => $UserProfile[5],
-		"Email" => $UserProfile[6]
-      );
-      $_SESSION['profile'] = $Person;
-      return true;
-    }
-    return false;
+    $UserProfile = convertSelectToArray($sql);
+    if($Password_Correct = password_verify($Passwort,$UserProfile[0])
+      $_SESSION['profile'] = createProfile($Benutername,$UserProfile);
+    return $Password_Correct;
   }
+
   function isLoggedIn(){
-	if(!isset($_SESSION['profile'])) return false;
-	return true;
+    if(!isset($_SESSION['profile'])) return false;
+    return true;
   }
+
   /******************************************************
         FUNKTIONEN ZUM HINZUFUEGEN IN DIE DATENBANK
   ******************************************************/
+
   function addExtra($Ausstattung){
-    $sql = "insert into tab_Extra(Ausstattung) values('".$Ausstattung."')";
-    return sqlInsertOrUpdate($sql);
+    return addSql("tab_Extra","Ausstattung","'".$Ausstattung."'");
   }
+
   function addMangel($Mangel){
-    $sql = "insert into tab_Mangel(Mangel) values('".$Mangel."')";
-    return sqlInsertOrUpdate($sql);
+    return addSql("tab_Mangel","Mangel","'".$Mangel."'");
   }
+
+  function addMotor($Motor){
+    return addSql("tab_MotorArt","Motor","'".$Motor."'");
+  }
+
+  function addMarke($Marke){
+    return addSql("tab_Marke","Marke","'".$Marke."'");
+  }
+
+  function addKlasse($Klasse){
+    return addSql("tab_Klasse","Klasse","'".$Klasse."'");
+  }
+
+  function addTyp($Typ,$KlassenNr,$MarkenNr){
+    return addSql("tab_Typ","Typ,KlassenNr,MarkenNr","'".$Typ."',".$KlassenNr." , ".$MarkenNr);
+  }
+
+  function addOrt($PLZ,$Ort){
+    return addSql("tab_Ort","PLZ,Ort","'".$PLZ."','".$Ort."'");
+  }
+
+  function addAuto($TypNr,$Farbe,$Kurzbeschreibung,$Detailbeschreibung,$StellplatzNr,$Baujahr,$Leistung,$KMLaufleistung,$MangelArray,$ExtrasArray,$MotorenArray){
+    addSql("tab_Auto","TypNr,Farbe,Kurzbeschreibung,Detailbeschreibung,StellplatzNr,Baujahr,Leistung,KMLaufleistung",$TypNr.",'".$Farbe."','".$Kurzbeschreibung."','".$Detailbeschreibung."',".$StellplatzNr.",".$Baujahr.",".$Leistung.",".$KMLaufleistung);
+    $AutoNr = getIdOfLastInserted();
+    foreach($MangelArray as $Mangel => $Value) setMangel($AutoNr,$Value);
+    foreach($ExtrasArray as $Extra => $Value) setAusstattung($AutoNr,$Value);
+    foreach($MotorenArray as $MotorenNr => $Value) setAusstattung($AutoNr,$Value);
+  }
+
+  function addBild($AutoNr, $Bildpfad){
+    return addSql("tab_Bilder","AutoNr,BildPfad",$AutoNr.",'".$Bildpfad."'");
+  }
+
   /******************************************************
                           SETTER
   ******************************************************/
+
   function setMangel($AutoNr,$MangelNr){
-    $sql = "insert into tab_Auto_Mangel(AutoNr,MangelNr) values(".$AutoNr.",".$MangelNr.")";
-    return sqlInsertOrUpdate($sql);
+    return addSql("tab_Auto_Mangel","AutoNr,MangelNr",$AutoNr.",".$MangelNr);
   }
+
   function setStellplatz($AutoNr,$StellplatzNr){
-    $sql = "update tab_Auto set StellplatzNr = ".$StellplatzNr." where AutoNr = ".$AutoNr;
-    return sqlInsertOrUpdate($sql);
+    return updateAutoSql($AutoNr,"StellplatzNr",$StellplatzNr);
   }
+
   function setAusstattung($AutoNr,$AusstattungsNr){
-    $sql = "insert into tab_Ausstattung(AutoNr,AusstattungsNr) values(".$AutoNr.",".$AusstattungsNr.")";
-    return sqlInsertOrUpdate($sql);
+    return addSql("tab_Ausstattung","AutoNr,AusstattungsNr",$AutoNr.",".$AusstattungsNr);
   }
+
+  function setMotoren($AutoNr,$MotorenNr){
+    return addSql("tab_Motor","AutoNr,MotorNr",$AutoNr.",".$MotorenNr);
+  }
+
+  function setFarbe($AutoNr,$Farbe){
+    return updateAutoSql($AutoNr,"Farbe",$Farbe);
+  }
+
+  function setKurbeschreibung($AutoNr,$Kurzbeschreibung){
+    return updateAutoSql($AutoNr,"Kurzbeschreibung",$Kurzbeschreibung);
+  }
+
+  function setDetailbeschreibung($AutoNr,$Detailbeschreibung){
+    return updateAutoSql($AutoNr,"Detailbeschreibung",$Detailbeschreibung);
+  }
+
+  function setKMLaufleistung($AutoNr,$KMLaufleistung){
+    return updateAutoSql($AutoNr,"KMLaufleistung",$KMLaufleistung);
+  }
+
+  function setLeistung($AutoNr,$Leistung){
+    return updateAutoSql($AutoNr,"Leistung",$Leistung);
+  }
+
+  function setBaujahr($AutoNr,$Baujahr){
+    return updateAutoSql($AutoNr,"Baujahr",$AutoNr);
+  }
+
   /******************************************************
                        GET ABFRAGEN
   ******************************************************/
+
   function getMarken(){
-    $sql = "select MarkenNr,Marke from tab_Marke";
-    return convertTableToArray($sql);
+    return selectSqlArray("tab_Marke","MarkenNr,Marke","1","1","=");
   }
+
   function getExtras(){
-    $sql = "select AusstattungsNr,Ausstattung from tab_Extra";
-    return convertTableToArray($sql);
+    return selectSqlArray("tab_Extra","AusstattungsNr,Ausstattung","1","1","=");
   }
+
   function getStellplaetze(){
-    $sql = "select StellplatzNr,Stellplatz from tab_Stellplatz";
-    return convertTableToArray($sql);
+    return selectSqlArray("tab_Stellplatz","StellplatzNr,Stellplatz","1","1","=");
   }
+
   function getKlassen(){
-    $sql = "select KlassenNr,Klasse from tab_Klasse";
-    return convertTableToArray($sql);
+    return selectSqlArray("tab_Klasse","KlassenNr,Klasse","1","1","=");
   }
+
   function getTypen(){
-    $typenArray = array();
     $sql = "select TypNr,Typ,tab_Marke.Marke,tab_Klasse.Klasse from tab_Typ
             inner join tab_Marke on tab_Marke.MarkenNr = tab_Typ.MarkenNr
             inner join tab_Klasse on tab_Klasse.KlassenNr = tab_Typ.KlassenNr";
-    $_typ = sendToDatabase($sql);
-    while($typ = mysqli_fetch_array($_typ)){
-      $AutoTyp = array("TypNr" => $typ[0],"Typ" => $typ[1], "Marke" => $typ[2],"Klasse" => $typ[3]);
-      array_push($typenArray, $AutoTyp);
-    }
-    return $typenArray;
+    return convertTypToArray($sql);
   }
+
+  function getMotoren(){
+    return selectSqlArray("tab_MotorArt","MotorNr,Motor","1","1","=");
+  }
+
+  /******************************************************
+                          DELETE
+  ******************************************************/
+
+  function deleteBild($BildNr){
+    return deleteSql("tab_Bilder","BildNr",$BildNr);
+  }
+
+  function deleteStellplatz($StellplatzNr){
+    return deleteSql("tab_Stellplatz","StellplatzNr",$StellplatzNr);
+  }
+
+  function deleteMangel($MangelNr){
+    return deleteSql("tab_Mangel","MangelNr",$MangelNr);
+  }
+
+  function deleteAusstattung($AusstattungsNr){
+    return deleteSql("tab_Extra","AusstattungsNr",$AusstattungsNr);
+  }
+
+  function deleteMotorArt($MotorNr){
+    return deleteSql("tab_MotorArt","MotorNr",$MotorNr);
+  }
+
+  function deleteMarke($MarkenNr){
+    return deleteSql("tab_Marke","MarkenNr",$MarkenNr);
+  }
+
+  function deleteKlasse($KlassenNr){
+    return deleteSql("tab_Klasse","KlassenNr",$KlassenNr);
+  }
+
   /******************************************************
                          CONVERTER
   ******************************************************/
+
   function PLZToOrt($PLZ){
-    $sql = "select ort from tab_ort where PLZ like '".$PLZ."'";
-    return convertSelectToValue($sql);
+    return selectSql("tab_ort","ort","PLZ",$PLZ,"like");
   }
+
   function StellplatzNrToStellplatz($StellplatzNr){
-    $sql = "select Stellplatz from tab_Stellplatz where StellplatzNr = ".$StellplatzNr;
-    return convertSelectToValue($sql);
+    return selectSql("tab_Stellplatz","Stellplatz","StellplatzNr",$StellplatzNr,"=");
   }
+
   function ExtraNrToExtra($ExtraNr){
-    $sql = "select Ausstattung from tab_Extra where AusstattungsNr = ".$ExtraNr;
-    return convertSelectToValue($sql);
+    return selectSql("tab_Extra","Ausstattung","AusstattungsNr",$ExtraNr,"=");
   }
+
   function MarkenNrToMarke($MarkenNr){
-    $sql = "select Marke from tab_Marke where MarkenNr = ".$MarkenNr;
-    return convertSelectToValue($sql);
+    return selectSql("tab_Marke","Marke","MarkenNr",$MarkenNr,"=");
   }
+
   function MangelNrToMangel($MaengelNr){
-    $sql = "select Mangel from tab_Mangel where MangelNr = ".$MaengelNr;
-    return convertSelectToValue($sql);
+    return selectSql("tab_Mangel","Mangel","MangelNr",$MaengelNr,"=");
   }
+
   function KlassenNrToKlasse($KlassenNr){
-    $sql = "select Klasse from tab_Klasse where KlassenNr = ".$KlassenNr;
-    return convertSelectToValue($sql);
+    return selectSql("tab_Klasse","Klasse","KlassenNr",$KlassenNr,"=");
   }
+
   function AutoNrToBilder($AutoNr){
-	$sql = "select BildNr, BildPfad from tab_Bilder where AutoNr = ".$AutoNr;
-	return convertTableToArray($sql);
+    return selectSqlArray("tab_Bilder","BildNr, BildPfad","AutoNr",$AutoNr,"=");
   }
+
   function AutoNrToAuto($AutoNr){
-	return convertAutoToArray($AutoNr);
+	  return convertAutoToArray($AutoNr);
   }
+
   function BenutzernameToWatchlist($Benutzername){
-	$sql = "select AutoNr,Stueckzahl,Status from tab_Watchlist where Benutzername = '".$Benutzername."'";
+	  $sql = "select AutoNr,Stueckzahl,Status from tab_Watchlist where Benutzername = '".$Benutzername."'";
+    return convertWatchlistToArray($sql);
   }
+
+  function AutoNrToExtras($AutoNr){
+    $sql = "select tab_Extra.AusstattungsNr, tab_Extra.Ausstattung from tab_Ausstattung
+            inner join tab_Extra on tab_Ausstattung.AusstattungsNr = tab_Extra.AusstattungsNr
+            where AutoNr = ".$AutoNr;
+    return convertTableToArray($sql);
+  }
+
+  function AutoNrToMangel($AutoNr){
+    $sql = "select tab_Mangel.MangelNr, tab_Mangel.Mangel from tab_Auto_Mangel
+            inner join tab_Mangel on tab_Auto_Mangel.MangelNr = tab_Mangel.MangelNr
+            where AutoNr = ".$AutoNr;
+    return convertTableToArray($sql);
+  }
+
+  function AutoNrToMotor($AutoNr){
+    $sql = "select tab_MotorArt.MotorNr,tab_MotorArt.Motor from tab_Motor
+            inner join tab_MotorArt on tab_Motor.MotorNr = tab_MotorArt.MotorNr
+            where AutoNr = ".$AutoNr;
+    return convertTableToArray($sql);
+  }
+
   /******************************************************
                       INTERNE FUNKTIONEN
   ******************************************************/
+
+  function errorHappend($errorMsg){
+    // Datenbank / txtdokument?
+  }
+
   function convertTableToArray($sqlQuery){
     $convertedArray = array();
     $query = sendToDatabase($sqlQuery);
@@ -207,58 +359,113 @@
     }
     return $convertedArray;
   }
+
   function convertSelectToValue($sql){
     $_value = sendToDatabase($sql);
     if(!$_value) return "Unbekannt";
     $value = mysqli_fetch_array($_value)[0];
     return $value;
   }
+
+  function convertSelectToArray($sql){
+    $_Values = sendToDatabase($sql);
+    $Values = mysqli_fetch_array($_Values);
+    return $Values;
+  }
+
   function sqlInsertOrUpdate($sql){
     if(!sendToDatabase($sql)) return false;
     return true;
   }
+
   function convertAutoToArray($AutoNr){
-	$AutoArray = array();
-  	$sql = "select tab_Stellplatz.Stellplatz, tab_Marke.Marke, tab_Klasse.Klasse, tab_Typ.Typ, AutoNr from tab_Auto
+  	$sql = "select tab_Stellplatz.Stellplatz, tab_Marke.Marke, tab_Klasse.Klasse, tab_Typ.Typ, AutoNr,Baujahr,Farbe,Kurzbeschreibung, Detailbeschreibung, KMLaufleistung,Leistung from tab_Auto
 			  inner join tab_stellplatz on tab_Stellplatz.StellplatzNr = tab_Auto.StellplatzNr
 			  inner join tab_Typ on tab_Typ.TypNr = tab_Auto.TypNr
 			  inner join tab_Marke on tab_Marke.MarkenNr = tab_Typ.MarkenNr
 			  inner join tab_Klasse on tab_Klasse.KlassenNr = tab_Typ.KlassenNr
 			  where AutoNr = ".$AutoNr;
-	$_AutoInformationen = sendToDatabase($sql);
-	$sql = "select tab_Extra.AusstattungsNr, tab_Extra.Ausstattung from tab_Ausstattung
-			  inner join tab_Extra on tab_Ausstattung.AusstattungsNr = tab_Extra.AusstattungsNr
-			  where AutoNr = ".$AutoNr;
-	$_AutoAusstattung = sendToDatabase($sql);
-	$sql = "select tab_Mangel.MangelNr, tab_Mangel.Mangel from tab_Auto_Mangel
-			  inner join tab_Mangel on tab_Auto_Mangel.MangelNr = tab_Mangel.MangelNr
-			  where AutoNr = ".$AutoNr;
-	$_AutoMaengel = sendToDatabase($sql);
-	$AutoInformationen = mysqli_fetch_array($_AutoInformationen);
-	$AusstattungsArray = array();
-	while($AutoAusstattung = mysqli_fetch_array($_AutoAusstattung)){
-		array_push($AusstattungsArray, array("AusstattungsNr" => $AutoAusstattung[0], "Ausstattung" => $AutoAusstattung[1]));
-	}
-	$MaengelArray = array();
-	while($AutoMaengel = mysqli_fetch_array($_AutoMaengel)){
-		array_push($MaengelArray, array("MangelNr" => $AutoMaengel[0], "Mangel" => $AutoMaengel[1]));
-	}
-	$AutoArray['Stellplatz'] = $AutoInformationen[0];
-	$AutoArray['Marke'] = $AutoInformationen[1];
-	$AutoArray['Klasse'] = $AutoInformationen[2];
-	$AutoArray['Typ'] = $AutoInformationen[3];
-	$AutoArray['AutoNr'] = $AutoInformationen[4];
-	$AutoArray['Ausstattung'] = $AusstattungsArray;
-	$AutoArray['Mangel'] = $MaengelArray;
+    $_AutoInformationen = sendToDatabase($sql);
+    $AutoInformationen = mysqli_fetch_array($_AutoInformationen);
+
+    $AutoArray = array(
+      "Stellplatz" => $AutoInformationen[0],
+      "Marke" => $AutoInformationen[1],
+      "Klasse" => $AutoInformationen[2],
+      "Typ" => $AutoInformationen3[],
+      "AutoNr" => $AutoInformationen[4],
+      "Baujahr" => $AutoInformationen[5],
+      "Farbe" => $AutoInformationen[6],
+      "Kurzbeschreibung" => $AutoInformationen[7],
+      "Detailbeschreibung" => $AutoInformationen[8],
+      "KMLaufleistung" => $AutoInformationen[9],
+      "Leistung" => $AutoInformationen[10],
+      "Ausstattung" => AutoNrToExtras($AutoNr),
+      "Mangel" => AutoNrToMangel($AutoNr),
+      "Motoren" => AutoNrToMotor($AutoNr)
+    )
+    return $AutoArray;
   }
+
   function convertWatchlistToArray($sql){
-	$_WatchlistObjekt = sendToDatabase($sql);
-	$WatchlistArray = array();
-	while($WatchlistObjekt = mysqli_fetch_array($_WatchlistObjekt)){
-		$WatchlistAuto = array();
-		$WatchlistAuto['Status'] = $WatchlistObjekt[2];
-		$WatchlistAuto['Stueckzahl'] = $WatchlistObjekt[1];
-		$WatchlistAuto['Auto'] = convertAutoToArray($WatchlistObjekt[0]);
-	}
+    $_WatchlistObjekt = sendToDatabase($sql);
+    $WatchlistArray = array();
+    while($WatchlistObjekt = mysqli_fetch_array($_WatchlistObjekt)){
+      $WatchlistAuto = array(
+        "Status" => $WatchlistObjekt[2],
+        "Stueckzahl" => $WatchlistObjekt[1],
+        "Auto" => convertAutoToArray($WatchlistObjekt[0])
+      );
+      array_push($WatchlistArray,$WatchlistAuto);
+    }
+    return $WatchlistArray;
+  }
+
+  function convertTypToArray($sql){
+    $typenArray = array();
+    $_typ = sendToDatabase($sql);
+    while($typ = mysqli_fetch_array($_typ)){
+      $AutoTyp = array("TypNr" => $typ[0],"Typ" => $typ[1], "Marke" => $typ[2],"Klasse" => $typ[3]);
+      array_push($typenArray, $AutoTyp);
+    }
+    return $typenArray;
+  }
+
+  function createProfile($Benutzername,$UserProfile){
+    $profileArray = array(
+      "Benutzername" => $Benutzername,
+      "Vorname" => $UserProfile[1],
+      "Nachname" => $UserProfile[2],
+      "PLZ" => $UserProfile[3],
+      "Adresse" => $UserProfile[4],
+      "Job" => $UserProfile[5],
+		  "Email" => $UserProfile[6]
+    );
+    return $profileArray;
+  }
+
+  function deleteSql($table,$key,$value){
+    $sql = "delete from ".$table." where ".$key." = '".$value."'";
+    return sqlInsertOrUpdate($sql);
+  }
+
+  function addSql($table,$Order,$values){
+    $sql = "insert into ".$table."(".$Order.") values(".$values.")";
+    return sqlInsertOrUpdate($sql);
+  }
+
+  function updateAutoSql($AutoNr,$Key,$Value){
+    $sql = "update tab_Auto set ".$Key." = ".$Value." where AutoNr = ".$AutoNr;
+    return sqlInsertOrUpdate($sql);
+  }
+
+  function selectSql($table,$value,$whereKey,$whereValue,$comparer){
+    $sql = "select ".$value." from ".$table." where ".$whereKey." ".$comparer." '".$whereValue."'";
+    return convertSelectToValue($sql);
+  }
+
+  function selectSqlArray($table,$value,$whereKey,$whereValue,$comparer){
+    $sql = "select ".$value." from ".$table." where ".$whereKey." ".$comparer." ".$whereValue;
+	  return convertTableToArray($sql);
   }
 ?>
