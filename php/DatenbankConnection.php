@@ -111,9 +111,9 @@
   ******************************************************/
   
   function createUser($Benutzername,$Passwort,$Email,$Vorname,$Nachname,$PLZ,$Adresse,$Job){
-	  $sql = "insert into tab_user(Benutzername,Passwort,email,Vorname,Nachname,plz,adresse,job)
-			values('".$Benutzername."','".password_hash($Passwort)."','".$Email."','".$Vorname."','".$Nachname."',
-			'".$PLZ."','".$Adresse."','".$Job."')";
+     $sql = "insert into tab_user(Benutzername,Passwort,email,Vorname,Nachname,plz,adresse,job)
+	     values('".$Benutzername."','".password_hash($Passwort)."','".$Email."','".$Vorname."','".$Nachname."',
+	     '".$PLZ."','".$Adresse."','".$Job."')";
     return sqlInsertOrUpdate($sql);
   }
   
@@ -163,11 +163,12 @@
   }
 
   function addAuto($TypNr,$Farbe,$Kurzbeschreibung,$Detailbeschreibung,$StellplatzNr,$Baujahr,$Leistung,$KMLaufleistung,$MangelArray,$ExtrasArray,$MotorenArray){
-    addSql("tab_Auto","TypNr,Farbe,Kurzbeschreibung,Detailbeschreibung,StellplatzNr,Baujahr,Leistung,KMLaufleistung",$TypNr.",'".$Farbe."','".$Kurzbeschreibung."','".$Detailbeschreibung."',".$StellplatzNr.",".$Baujahr.",".$Leistung.",".$KMLaufleistung);
+    $success = addSql("tab_Auto","TypNr,Farbe,Kurzbeschreibung,Detailbeschreibung,StellplatzNr,Baujahr,Leistung,KMLaufleistung",$TypNr.",'".$Farbe."','".$Kurzbeschreibung."','".$Detailbeschreibung."',".$StellplatzNr.",".$Baujahr.",".$Leistung.",".$KMLaufleistung);
     $AutoNr = getIdOfLastInserted();
     foreach($MangelArray as $Mangel => $Value) setMangel($AutoNr,$Value);
     foreach($ExtrasArray as $Extra => $Value) setAusstattung($AutoNr,$Value);
     foreach($MotorenArray as $MotorenNr => $Value) setAusstattung($AutoNr,$Value);
+    return $success;
   }
 
   function addBild($AutoNr, $Bildpfad){
@@ -239,9 +240,7 @@
   }
 
   function getTypen(){
-    $sql = "select TypNr,Typ,tab_Marke.Marke,tab_Klasse.Klasse from tab_Typ
-            inner join tab_Marke on tab_Marke.MarkenNr = tab_Typ.MarkenNr
-            inner join tab_Klasse on tab_Klasse.KlassenNr = tab_Typ.KlassenNr";
+    $sql = "select TypNr,Typ,tab_Marke.Marke,tab_Klasse.Klasse from getTypen";
     return convertTypToArray($sql);
   }
 
@@ -318,29 +317,19 @@
   }
 
   function BenutzernameToWatchlist($Benutzername){
-	  $sql = "select AutoNr,Stueckzahl,Status from tab_Watchlist where Benutzername = '".$Benutzername."'";
-    return convertWatchlistToArray($sql);
+    return convertWatchlistToArray($Benutzername);
   }
 
   function AutoNrToExtras($AutoNr){
-    $sql = "select tab_Extra.AusstattungsNr, tab_Extra.Ausstattung from tab_Ausstattung
-            inner join tab_Extra on tab_Ausstattung.AusstattungsNr = tab_Extra.AusstattungsNr
-            where AutoNr = ".$AutoNr;
-    return convertTableToArray($sql);
+    return selectSqlArray("AutoNrToExtras","AusstattungsNr, Ausstattung","AutoNr",$AutoNr,"=");
   }
 
   function AutoNrToMangel($AutoNr){
-    $sql = "select tab_Mangel.MangelNr, tab_Mangel.Mangel from tab_Auto_Mangel
-            inner join tab_Mangel on tab_Auto_Mangel.MangelNr = tab_Mangel.MangelNr
-            where AutoNr = ".$AutoNr;
-    return convertTableToArray($sql);
+    return selectSqlArray("AutoNrToMangel","MangelNr,Mangel","AutoNr",$AutoNr,"=");
   }
 
   function AutoNrToMotor($AutoNr){
-    $sql = "select tab_MotorArt.MotorNr,tab_MotorArt.Motor from tab_Motor
-            inner join tab_MotorArt on tab_Motor.MotorNr = tab_MotorArt.MotorNr
-            where AutoNr = ".$AutoNr;
-    return convertTableToArray($sql);
+    return selectSqlArray("AutoNrToMotor","MotorNr,Motor","AutoNr",$AutoNr,"=");
   }
 
   /******************************************************
@@ -348,7 +337,8 @@
   ******************************************************/
 
   function errorHappend($errorMsg){
-    // Datenbank / txtdokument?
+    $sql = "insert into tab_Fehlermeldung(Fehlermeldung) values('".$errorMsg."')";
+    return sqlInsertOrUpdate($sql);
   }
 
   function convertTableToArray($sqlQuery){
@@ -379,12 +369,7 @@
   }
 
   function convertAutoToArray($AutoNr){
-  	$sql = "select tab_Stellplatz.Stellplatz, tab_Marke.Marke, tab_Klasse.Klasse, tab_Typ.Typ, AutoNr,Baujahr,Farbe,Kurzbeschreibung, Detailbeschreibung, KMLaufleistung,Leistung from tab_Auto
-			  inner join tab_stellplatz on tab_Stellplatz.StellplatzNr = tab_Auto.StellplatzNr
-			  inner join tab_Typ on tab_Typ.TypNr = tab_Auto.TypNr
-			  inner join tab_Marke on tab_Marke.MarkenNr = tab_Typ.MarkenNr
-			  inner join tab_Klasse on tab_Klasse.KlassenNr = tab_Typ.KlassenNr
-			  where AutoNr = ".$AutoNr;
+    $sql = "select * from convertAutoToArray where AutoNr = ".$AutoNr;
     $_AutoInformationen = sendToDatabase($sql);
     $AutoInformationen = mysqli_fetch_array($_AutoInformationen);
 
@@ -407,7 +392,8 @@
     return $AutoArray;
   }
 
-  function convertWatchlistToArray($sql){
+  function convertWatchlistToArray($Benutzername){
+    $sql = "select AutoNr,Stueckzahl,Status from tab_Watchlist where Benutzername = '".$Benutzername."'";
     $_WatchlistObjekt = sendToDatabase($sql);
     $WatchlistArray = array();
     while($WatchlistObjekt = mysqli_fetch_array($_WatchlistObjekt)){
@@ -466,6 +452,6 @@
 
   function selectSqlArray($table,$value,$whereKey,$whereValue,$comparer){
     $sql = "select ".$value." from ".$table." where ".$whereKey." ".$comparer." ".$whereValue;
-	  return convertTableToArray($sql);
+    return convertTableToArray($sql);
   }
 ?>
