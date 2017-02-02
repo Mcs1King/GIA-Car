@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: 127.0.0.1
--- Erstellungszeit: 01. Feb 2017 um 12:32
+-- Erstellungszeit: 02. Feb 2017 um 10:53
 -- Server Version: 5.6.11
 -- PHP-Version: 5.5.1
 
@@ -45,6 +45,8 @@ CREATE TABLE IF NOT EXISTS `tab_auto` (
   `autonr` int(11) NOT NULL,
   `StellplatzNr` int(11) DEFAULT NULL,
   `TypNr` int(11) DEFAULT NULL,
+  `Kurzbeschreibung` text,
+  `Detailbeschreibung` text,
   PRIMARY KEY (`autonr`),
   KEY `StellplatzNr` (`StellplatzNr`),
   KEY `TypNr` (`TypNr`)
@@ -60,6 +62,20 @@ CREATE TABLE IF NOT EXISTS `tab_auto_mangel` (
   `MangelNr` int(11) DEFAULT NULL,
   `AutoNr` int(11) DEFAULT NULL,
   KEY `MangelNr` (`MangelNr`),
+  KEY `AutoNr` (`AutoNr`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Tabellenstruktur für Tabelle `tab_bilder`
+--
+
+CREATE TABLE IF NOT EXISTS `tab_bilder` (
+  `BildNr` int(11) NOT NULL,
+  `Bildpfad` varchar(256) DEFAULT NULL,
+  `AutoNr` int(11) DEFAULT NULL,
+  PRIMARY KEY (`BildNr`),
   KEY `AutoNr` (`AutoNr`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
@@ -8426,12 +8442,28 @@ CREATE TABLE IF NOT EXISTS `tab_user` (
   `Passwort` varchar(256) COLLATE latin1_general_ci DEFAULT NULL,
   `Vorname` varchar(50) COLLATE latin1_general_ci DEFAULT NULL,
   `Nachname` varchar(50) COLLATE latin1_general_ci DEFAULT NULL,
+  `Email` text COLLATE latin1_general_ci,
   `Adresse` varchar(50) COLLATE latin1_general_ci DEFAULT NULL,
   `job` varchar(50) COLLATE latin1_general_ci DEFAULT NULL,
   `PLZ` char(5) COLLATE latin1_general_ci DEFAULT NULL,
   PRIMARY KEY (`Benutzername`),
   KEY `PLZ` (`PLZ`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Tabellenstruktur für Tabelle `tab_watchlist`
+--
+
+CREATE TABLE IF NOT EXISTS `tab_watchlist` (
+  `Benutzername` varchar(50) CHARACTER SET latin1 COLLATE latin1_general_ci NOT NULL,
+  `AutoNr` int(11) DEFAULT NULL,
+  `Stueckzahl` int(11) DEFAULT NULL,
+  `status` int(11) NOT NULL DEFAULT '0',
+  KEY `Benutzername` (`Benutzername`),
+  KEY `AutoNr` (`AutoNr`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
 -- Constraints der exportierten Tabellen
@@ -8459,6 +8491,12 @@ ALTER TABLE `tab_auto_mangel`
   ADD CONSTRAINT `tab_auto_mangel_ibfk_2` FOREIGN KEY (`AutoNr`) REFERENCES `tab_auto` (`autonr`);
 
 --
+-- Constraints der Tabelle `tab_bilder`
+--
+ALTER TABLE `tab_bilder`
+  ADD CONSTRAINT `tab_bilder_ibfk_1` FOREIGN KEY (`AutoNr`) REFERENCES `tab_auto` (`autonr`);
+
+--
 -- Constraints der Tabelle `tab_typ`
 --
 ALTER TABLE `tab_typ`
@@ -8470,6 +8508,13 @@ ALTER TABLE `tab_typ`
 --
 ALTER TABLE `tab_user`
   ADD CONSTRAINT `tab_user_ibfk_1` FOREIGN KEY (`PLZ`) REFERENCES `tab_ort` (`PLZ`);
+
+--
+-- Constraints der Tabelle `tab_watchlist`
+--
+ALTER TABLE `tab_watchlist`
+  ADD CONSTRAINT `tab_watchlist_ibfk_1` FOREIGN KEY (`Benutzername`) REFERENCES `tab_user` (`Benutzername`),
+  ADD CONSTRAINT `tab_watchlist_ibfk_2` FOREIGN KEY (`AutoNr`) REFERENCES `tab_auto` (`autonr`);
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
