@@ -385,6 +385,7 @@
       "Detailbeschreibung" => $AutoInformationen[8],
       "KMLaufleistung" => $AutoInformationen[9],
       "Leistung" => $AutoInformationen[10],
+      "Preis" => $AutoInformationen[11],
       "Ausstattung" => AutoNrToExtras($AutoNr),
       "Mangel" => AutoNrToMangel($AutoNr),
       "Motoren" => AutoNrToMotor($AutoNr)
