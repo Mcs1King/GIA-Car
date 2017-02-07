@@ -23,7 +23,7 @@
       - addKlasse(Klasse)
       - addTyp(Typ,KlassenNr,MarkenNr)
       - addOrt(PLZ,Ort)
-      - addAuto(TypNr,Farbe,Kurzbeschreibung,Detailbeschreibung,StellplatzNr,Baujahr,Leistung,KMLaufleistung,MangelArray,ExtrasArray,MotorenArray)
+      - addAuto(TypNr,Farbe,Kurzbeschreibung,Detailbeschreibung,StellplatzNr,Baujahr,Leistung,Preis,KMLaufleistung,MangelArray,ExtrasArray,MotorenArray)
       - addBild(AutoNr, Bildpfad)
    --------------------------------------------------------------------------------------------------------------------------------------
     SETTER
@@ -162,8 +162,8 @@
     return addSql("tab_Ort","PLZ,Ort","'".$PLZ."','".$Ort."'");
   }
 
-  function addAuto($TypNr,$Farbe,$Kurzbeschreibung,$Detailbeschreibung,$StellplatzNr,$Baujahr,$Leistung,$KMLaufleistung,$MangelArray,$ExtrasArray,$MotorenArray){
-    $success = addSql("tab_Auto","TypNr,Farbe,Kurzbeschreibung,Detailbeschreibung,StellplatzNr,Baujahr,Leistung,KMLaufleistung",$TypNr.",'".$Farbe."','".$Kurzbeschreibung."','".$Detailbeschreibung."',".$StellplatzNr.",".$Baujahr.",".$Leistung.",".$KMLaufleistung);
+  function addAuto($TypNr,$Farbe,$Kurzbeschreibung,$Detailbeschreibung,$StellplatzNr,$Baujahr,$Leistung,$Preis,$KMLaufleistung,$MangelArray,$ExtrasArray,$MotorenArray){
+    $success = addSql("tab_Auto","TypNr,Farbe,Kurzbeschreibung,Detailbeschreibung,StellplatzNr,Baujahr,Leistung,Preis,KMLaufleistung",$TypNr.",'".$Farbe."','".$Kurzbeschreibung."','".$Detailbeschreibung."',".$StellplatzNr.",".$Baujahr.",".$Leistung.",".$Preis.",".$KMLaufleistung);
     $AutoNr = getIdOfLastInserted();
     foreach($MangelArray as $Mangel => $Value) setMangel($AutoNr,$Value);
     foreach($ExtrasArray as $Extra => $Value) setAusstattung($AutoNr,$Value);
