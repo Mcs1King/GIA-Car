@@ -23,7 +23,7 @@
       - addKlasse(Klasse)
       - addTyp(Typ,KlassenNr,MarkenNr)
       - addOrt(PLZ,Ort)
-      - addAuto(TypNr,Farbe,Kurzbeschreibung,Detailbeschreibung,StellplatzNr,Baujahr,Leistung,Preis,KMLaufleistung,MangelArray,ExtrasArray,MotorenArray)
+      - addAuto(TypNr,Farbe,Kurzbeschreibung,Detailbeschreibung,StellplatzNr,Baujahr,Leistung,KMLaufleistung,MangelArray,ExtrasArray,MotorenArray)
       - addBild(AutoNr, Bildpfad)
    --------------------------------------------------------------------------------------------------------------------------------------
     SETTER
@@ -33,7 +33,7 @@
       - setAusstattung(AutoNr,AusstattungsNr)
       - setMotoren(AutoNr,MotorenNr)
       - setFarbe(AutoNr,Farbe)
-      - setKurbeschreibung(AutoNr,Kurzbeschreibung)
+      - setKurzbeschreibung(AutoNr,Kurzbeschreibung)
       - setDetailbeschreibung(AutoNr,Detailbeschreibung)
       - setKMLaufleistung(AutoNr,KMLaufleistung)
       - setLeistung(AutoNr,Leistung)
@@ -75,34 +75,44 @@
   **************************************************************************************************************************************/
 
   session_start();
+  connect();
+  $GLOBALS['Errors'] = array();
 
   /******************************************************
              DATENBANK VERBINDUNGS FUNKTIONEN
   ******************************************************/
 
   function connect(){
-    $host = "";
-    $user = "";
+    $host = "localhost";
+    $user = "root";
     $pass = "";
-    $database = "";
+    $database = "gia_car3";
     $con = mysqli_connect($host,$user,$pass,$database);
-    if(!$con){
-      errorHappend(mysqli_error($con));
-      die("Fehler beim verbinden mit der Datenbank");
+    if(mysqli_connect_errno()){
+      errorHappend(mysqli_connect_error());
+      mysqli_close($con);
+      //die("Fehler beim verbinden mit der Datenbank");
+      return false;
     }
-    return $con;
+    $GLOBALS["Connection"] = $con;
+    return true;
   }
   
-  function sendToDatabase($commmand){
-    $con = connect();
+  function sendToDatabase($command){
+    $con = $GLOBALS["Connection"];
+    if($con == false){
+      return false;
+    }
     $result = mysqli_query($con,$command);
-    if(!$result)
+    if(!$result){
       errorHappend(mysqli_error($con));
+      return false;
+    }
     return $result;
   }
 
   function getIdOfLastInserted(){
-    $con = connect();
+    $con = $GLOBALS["Connection"];
     return mysqli_insert_id($con);
   }
 
@@ -111,17 +121,17 @@
   ******************************************************/
   
   function createUser($Benutzername,$Passwort,$Email,$Vorname,$Nachname,$PLZ,$Adresse,$Job){
-     $sql = "insert into tab_user(Benutzername,Passwort,email,Vorname,Nachname,plz,adresse,job)
-	     values('".$Benutzername."','".password_hash($Passwort)."','".$Email."','".$Vorname."','".$Nachname."',
-	     '".$PLZ."','".$Adresse."','".$Job."')";
+	  $sql = "insert into tab_user(Benutzername,Passwort,email,Vorname,Nachname,plz,adresse,job)
+			values('".$Benutzername."','".password_hash($Passwort,PASSWORD_BCRYPT)."','".$Email."','".$Vorname."','".$Nachname."',
+			'".$PLZ."','".$Adresse."','".$Job."')";
     return sqlInsertOrUpdate($sql);
   }
   
   function login($Benutzername,$Passwort){
     $sql = "select Passwort,vorname,nachname,plz,adresse,job,Email from tab_User where Benutzername like '".$Benutzername."'";
     $UserProfile = convertSelectToArray($sql);
-    if($Password_Correct = password_verify($Passwort,$UserProfile[0])
-      $_SESSION['profile'] = createProfile($Benutername,$UserProfile);
+    if($Password_Correct = password_verify($Passwort,$UserProfile[0]))
+      $_SESSION['profile'] = createProfile($Benutzername,$UserProfile);
     return $Password_Correct;
   }
 
@@ -162,8 +172,8 @@
     return addSql("tab_Ort","PLZ,Ort","'".$PLZ."','".$Ort."'");
   }
 
-  function addAuto($TypNr,$Farbe,$Kurzbeschreibung,$Detailbeschreibung,$StellplatzNr,$Baujahr,$Leistung,$Preis,$KMLaufleistung,$MangelArray,$ExtrasArray,$MotorenArray){
-    $success = addSql("tab_Auto","TypNr,Farbe,Kurzbeschreibung,Detailbeschreibung,StellplatzNr,Baujahr,Leistung,Preis,KMLaufleistung",$TypNr.",'".$Farbe."','".$Kurzbeschreibung."','".$Detailbeschreibung."',".$StellplatzNr.",".$Baujahr.",".$Leistung.",".$Preis.",".$KMLaufleistung);
+  function addAuto($TypNr,$Farbe,$Kurzbeschreibung,$Detailbeschreibung,$StellplatzNr,$Baujahr,$Leistung,$KMLaufleistung,$MangelArray,$ExtrasArray,$MotorenArray){
+    $success = addSql("tab_Auto","TypNr,Farbe,Kurzbeschreibung,Detailbeschreibung,StellplatzNr,Baujahr,Leistung,KMLaufleistung",$TypNr.",'".$Farbe."','".$Kurzbeschreibung."','".$Detailbeschreibung."',".$StellplatzNr.",".$Baujahr.",".$Leistung.",".$KMLaufleistung);
     $AutoNr = getIdOfLastInserted();
     foreach($MangelArray as $Mangel => $Value) setMangel($AutoNr,$Value);
     foreach($ExtrasArray as $Extra => $Value) setAusstattung($AutoNr,$Value);
@@ -199,7 +209,7 @@
     return updateAutoSql($AutoNr,"Farbe",$Farbe);
   }
 
-  function setKurbeschreibung($AutoNr,$Kurzbeschreibung){
+  function setKurzbeschreibung($AutoNr,$Kurzbeschreibung){
     return updateAutoSql($AutoNr,"Kurzbeschreibung",$Kurzbeschreibung);
   }
 
@@ -240,8 +250,7 @@
   }
 
   function getTypen(){
-    $sql = "select TypNr,Typ,tab_Marke.Marke,tab_Klasse.Klasse from getTypen";
-    return convertTypToArray($sql);
+    return selectSqlArray("getTypen","TypNr,Typ,Marke,Klasse","1","1","=");
   }
 
   function getMotoren(){
@@ -337,15 +346,14 @@
   ******************************************************/
 
   function errorHappend($errorMsg){
-    $sql = "insert into tab_Fehlermeldung(Fehlermeldung) values('".$errorMsg."')";
-    return sqlInsertOrUpdate($sql);
+    array_push($GLOBALS['Errors'],$errorMsg);
   }
 
   function convertTableToArray($sqlQuery){
     $convertedArray = array();
     $query = sendToDatabase($sqlQuery);
     while($value = mysqli_fetch_array($query)){
-      array_push($convertedArray,array("Name" => $value[1],"Nr" => $value[0]);
+      array_push($convertedArray,array("Name" => $value[1],"Nr" => $value[0]));
     }
     return $convertedArray;
   }
@@ -369,7 +377,7 @@
   }
 
   function convertAutoToArray($AutoNr){
-    $sql = "select * from convertAutoToArray where AutoNr = ".$AutoNr;
+  	$sql = "select * from convertAutoToArray where AutoNr = ".$AutoNr;
     $_AutoInformationen = sendToDatabase($sql);
     $AutoInformationen = mysqli_fetch_array($_AutoInformationen);
 
@@ -377,7 +385,7 @@
       "Stellplatz" => $AutoInformationen[0],
       "Marke" => $AutoInformationen[1],
       "Klasse" => $AutoInformationen[2],
-      "Typ" => $AutoInformationen3[],
+      "Typ" => $AutoInformationen3[3],
       "AutoNr" => $AutoInformationen[4],
       "Baujahr" => $AutoInformationen[5],
       "Farbe" => $AutoInformationen[6],
@@ -389,7 +397,7 @@
       "Ausstattung" => AutoNrToExtras($AutoNr),
       "Mangel" => AutoNrToMangel($AutoNr),
       "Motoren" => AutoNrToMotor($AutoNr)
-    )
+    );
     return $AutoArray;
   }
 
@@ -411,6 +419,7 @@
   function convertTypToArray($sql){
     $typenArray = array();
     $_typ = sendToDatabase($sql);
+    if($_typ == false) return false;
     while($typ = mysqli_fetch_array($_typ)){
       $AutoTyp = array("TypNr" => $typ[0],"Typ" => $typ[1], "Marke" => $typ[2],"Klasse" => $typ[3]);
       array_push($typenArray, $AutoTyp);
@@ -453,6 +462,6 @@
 
   function selectSqlArray($table,$value,$whereKey,$whereValue,$comparer){
     $sql = "select ".$value." from ".$table." where ".$whereKey." ".$comparer." ".$whereValue;
-    return convertTableToArray($sql);
+	  return convertTableToArray($sql);
   }
 ?>
