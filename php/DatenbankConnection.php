@@ -2,7 +2,7 @@
   /**************************************************************************************************************************************
                                             OVERVIEW
    --------------------------------------------------------------------------------------------------------------------------------------
-    Datenbank Verbindungs Funktion
+    DATENBANK VERBINDUNGS FUNKTIONEN
    --------------------------------------------------------------------------------------------------------------------------------------
       - connect()
       - sendToDatabase(command)
@@ -76,7 +76,8 @@
 
   session_start();
   connect();
-  $GLOBALS['Errors'] = array();
+  if(!$_SESSION['Errors'])
+  	$_SESSION['Errors'] = array();
 
   /******************************************************
              DATENBANK VERBINDUNGS FUNKTIONEN
@@ -322,7 +323,7 @@
   }
 
   function AutoNrToAuto($AutoNr){
-	  return convertAutoToArray($AutoNr);
+    return convertAutoToArray($AutoNr);
   }
 
   function BenutzernameToWatchlist($Benutzername){
@@ -346,7 +347,7 @@
   ******************************************************/
 
   function errorHappend($errorMsg){
-    array_push($GLOBALS['Errors'],$errorMsg);
+    array_push($_SESSION['Errors'],$errorMsg);
   }
 
   function convertTableToArray($sqlQuery){
@@ -379,21 +380,21 @@
   function convertAutoToArray($AutoNr){
   	$sql = "select * from convertAutoToArray where AutoNr = ".$AutoNr;
     $_AutoInformationen = sendToDatabase($sql);
-    $AutoInformationen = mysqli_fetch_array($_AutoInformationen);
+    $AutoInformationen = mysqli_fetch_object($_AutoInformationen);
 
     $AutoArray = array(
-      "Stellplatz" => $AutoInformationen[0],
-      "Marke" => $AutoInformationen[1],
-      "Klasse" => $AutoInformationen[2],
-      "Typ" => $AutoInformationen3[3],
-      "AutoNr" => $AutoInformationen[4],
-      "Baujahr" => $AutoInformationen[5],
-      "Farbe" => $AutoInformationen[6],
-      "Kurzbeschreibung" => $AutoInformationen[7],
-      "Detailbeschreibung" => $AutoInformationen[8],
-      "KMLaufleistung" => $AutoInformationen[9],
-      "Leistung" => $AutoInformationen[10],
-      "Preis" => $AutoInformationen[11],
+      "Stellplatz" => $AutoInformationen->stellplatz,
+      "Marke" => $AutoInformationen->marke,
+      "Klasse" => $AutoInformationen->klasse,
+      "Typ" => $AutoInformationen->typ,
+      "AutoNr" => $AutoInformationen->AutoNr,
+      "Baujahr" => $AutoInformationen->Baujahr,
+      "Farbe" => $AutoInformationen->Farbe,
+      "Kurzbeschreibung" => $AutoInformationen->Kurzbeschreibung,
+      "Detailbeschreibung" => $AutoInformationen->Detailbeschreibung,
+      "KMLaufleistung" => $AutoInformationen->KMLaufleistung,
+      "Leistung" => $AutoInformationen->Leistung,
+      "Preis" => $AutoInformationen->Preis,
       "Ausstattung" => AutoNrToExtras($AutoNr),
       "Mangel" => AutoNrToMangel($AutoNr),
       "Motoren" => AutoNrToMotor($AutoNr)
