@@ -1,9 +1,9 @@
--- phpMyAdmin SQL Dump
+﻿-- phpMyAdmin SQL Dump
 -- version 4.5.1
 -- http://www.phpmyadmin.net
 --
 -- Host: 127.0.0.1
--- Erstellungszeit: 02. Feb 2017 um 23:34
+-- Erstellungszeit: 08. Feb 2017 um 18:15
 -- Server-Version: 10.1.19-MariaDB
 -- PHP-Version: 7.0.13
 
@@ -17,9 +17,9 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Datenbank: `gia_car3`
+-- Datenbank: `gia_car`
 --
-CREATE DATABASE IF NOT EXISTS `gia_car3` DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci;
+CREATE DATABASE IF NOT EXISTS `gia_car` DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci;
 USE `gia_car3`;
 
 -- --------------------------------------------------------
@@ -72,6 +72,7 @@ CREATE TABLE `convertautotoarray` (
 ,`Detailbeschreibung` text
 ,`KMLaufleistung` int(11)
 ,`Leistung` int(11)
+,`Preis` float
 );
 
 -- --------------------------------------------------------
@@ -118,16 +119,18 @@ CREATE TABLE `tab_auto` (
   `Leistung` int(11) DEFAULT NULL,
   `KMLaufleistung` int(11) DEFAULT NULL,
   `Baujahr` int(11) DEFAULT NULL,
+  `Preis` float DEFAULT NULL,
   `Kurzbeschreibung` text,
-  `Detailbeschreibung` text
+  `Detailbeschreibung` text,
+  `AnzahlAufrufe` int(11) NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
 -- Daten für Tabelle `tab_auto`
 --
 
-INSERT INTO `tab_auto` (`autoNR`, `farbe`, `stellplatznr`, `typNr`, `Leistung`, `KMLaufleistung`, `Baujahr`, `Kurzbeschreibung`, `Detailbeschreibung`) VALUES
-(2, 'schwarz', 1, 1, 123, 90000, 2013, '1 cooles auto', '1 sehr sehr sehr sehr cooles auto');
+INSERT INTO `tab_auto` (`autoNR`, `farbe`, `stellplatznr`, `typNr`, `Leistung`, `KMLaufleistung`, `Baujahr`, `Preis`, `Kurzbeschreibung`, `Detailbeschreibung`, `AnzahlAufrufe`) VALUES
+(2, 'schwarz', 1, 1, 123, 90000, 2013, 20001, '1 cooles auto', '1 sehr sehr sehr sehr cooles auto', 0);
 
 -- --------------------------------------------------------
 
@@ -8656,7 +8659,7 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 --
 DROP TABLE IF EXISTS `convertautotoarray`;
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `convertautotoarray`  AS  select `tab_stellplatz`.`Stellplatz` AS `stellplatz`,`tab_marke`.`Marke` AS `marke`,`tab_klasse`.`Klasse` AS `klasse`,`tab_typ`.`Typ` AS `typ`,`tab_auto`.`autoNR` AS `AutoNr`,`tab_auto`.`Baujahr` AS `Baujahr`,`tab_auto`.`farbe` AS `Farbe`,`tab_auto`.`Kurzbeschreibung` AS `Kurzbeschreibung`,`tab_auto`.`Detailbeschreibung` AS `Detailbeschreibung`,`tab_auto`.`KMLaufleistung` AS `KMLaufleistung`,`tab_auto`.`Leistung` AS `Leistung` from ((((`tab_auto` join `tab_stellplatz` on((`tab_stellplatz`.`stellplatznr` = `tab_auto`.`stellplatznr`))) join `tab_typ` on((`tab_typ`.`typNr` = `tab_auto`.`typNr`))) join `tab_marke` on((`tab_marke`.`MarkenNr` = `tab_typ`.`MarkenNr`))) join `tab_klasse` on((`tab_klasse`.`KlassenNr` = `tab_typ`.`KlassenNr`))) ;
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `convertautotoarray`  AS  select `tab_stellplatz`.`Stellplatz` AS `stellplatz`,`tab_marke`.`Marke` AS `marke`,`tab_klasse`.`Klasse` AS `klasse`,`tab_typ`.`Typ` AS `typ`,`tab_auto`.`autoNR` AS `AutoNr`,`tab_auto`.`Baujahr` AS `Baujahr`,`tab_auto`.`farbe` AS `Farbe`,`tab_auto`.`Kurzbeschreibung` AS `Kurzbeschreibung`,`tab_auto`.`Detailbeschreibung` AS `Detailbeschreibung`,`tab_auto`.`KMLaufleistung` AS `KMLaufleistung`,`tab_auto`.`Leistung` AS `Leistung`,`tab_auto`.`Preis` AS `Preis` from ((((`tab_auto` join `tab_stellplatz` on((`tab_stellplatz`.`stellplatznr` = `tab_auto`.`stellplatznr`))) join `tab_typ` on((`tab_typ`.`typNr` = `tab_auto`.`typNr`))) join `tab_marke` on((`tab_marke`.`MarkenNr` = `tab_typ`.`MarkenNr`))) join `tab_klasse` on((`tab_klasse`.`KlassenNr` = `tab_typ`.`KlassenNr`))) ;
 
 -- --------------------------------------------------------
 
