@@ -48,6 +48,16 @@
         - Get Klassen
         - Get Typen
         - Get Motoren
+    ------------------------------------------------------------
+     TESTEN DER DELETE BEFEHLE
+    ------------------------------------------------------------		
+		- delete Bild
+        - delete Stellplatz
+        - delete Mangel
+        - delete Ausstattung
+        - delete Motorart
+        - delete Marke
+		- delete Klasse
     ***********************************************************/
 
     include('DatenbankConnection.php');
@@ -94,24 +104,23 @@
         outputFunctionTest("Motor Hinzufügen", addMotor("Test"));
         outputFunctionTest("Marke Hinzufügen", addMarke("Test"));
         outputFunctionTest("Klasse Hinzufügen", addKlasse("Test"));
-        outputFunctionTest("Typ Hinzufügen", addTyp("Test",0,0));
-        outputFunctionTest("Ort Hinzufügen", addOrt("02321","Test"));
-        outputFunctionTest("Auto Hinzufügen", addAuto(0,"Gelb","Test","Test",0,1981,109,203999,array(0),array(0),array(0)));
-        outputFunctionTest("Bild Hinzufügen", addBild(0,"./Test.png"));
+        outputFunctionTest("Typ Hinzufügen", addTyp("Test",1,1));
+        outputFunctionTest("Auto Hinzufügen", addAuto(1,"Gelb","Test","Test",1,1981,109,203999,array(1),array(1),array(1)));
+        outputFunctionTest("Bild Hinzufügen", addBild(2,"./Test.png"));
     
         /******************************************************
                             TESTEN DER SETTER
         ******************************************************/
-        outputFunctionTest("Mangel Setzen",setMangel(0,0));
-        outputFunctionTest("Stellplatz Setzen", setStellplatz(0,0));
-        outputFunctionTest("Ausstattung Setzen", setAusstattung(0,0));
-        outputFunctionTest("Motor Setzen", setMotoren(0,0));
-        outputFunctionTest("Farbe Setzen", setFarbe(0,0));
-        outputFunctionTest("Kurzbeschreibung Setzen", setKurzbeschreibung(0,0));
-        outputFunctionTest("Detailbeschreibung Setzen", setDetailbeschreibung(0,0));
-        outputFunctionTest("KMLaufleistung Setzen", setKMLaufleistung(0,0));
-        outputFunctionTest("Leistung Setzen", setLeistung(0,100));
-        outputFunctionTest("Baujahr Setzen", setBaujahr(0,2000));
+        outputFunctionTest("Mangel Setzen",setMangel(2,1));
+        outputFunctionTest("Stellplatz Setzen", setStellplatz(2,1));
+        outputFunctionTest("Ausstattung Setzen", setAusstattung(2,1));
+        outputFunctionTest("Motor Setzen", setMotoren(2,1));
+        outputFunctionTest("Farbe Setzen", setFarbe(2,1));
+        outputFunctionTest("Kurzbeschreibung Setzen", setKurzbeschreibung(2,1));
+        outputFunctionTest("Detailbeschreibung Setzen", setDetailbeschreibung(2,1));
+        outputFunctionTest("KMLaufleistung Setzen", setKMLaufleistung(2,1));
+        outputFunctionTest("Leistung Setzen", setLeistung(2,100));
+        outputFunctionTest("Baujahr Setzen", setBaujahr(2,2000));
 
         /******************************************************
                         TESTEN DER GET ABFRAGEN
@@ -122,13 +131,25 @@
         outputFunctionTest("Get Klassen", getKlassen());
         outputFunctionTest("Get Typen", getTypen());
         outputFunctionTest("Get Motoren", getMotoren());
+		
+		/******************************************************
+                        TESTEN DER DELETE BEFEHLE
+        ******************************************************/
+		
+		outputFunctionTest("Bild Löschen", deleteBild(6));
+        outputFunctionTest("Stellplatz Löschen", deleteStellplatz(2));
+        outputFunctionTest("Mangel Löschen", deleteMangel(2));
+        outputFunctionTest("Ausstattung Löschen", deleteAusstattung(3));
+        outputFunctionTest("Motorart Löschen", deleteMotorArt(2));
+        outputFunctionTest("Marke Löschen", deleteMarke(2));
+		outputFunctionTest("Klasse Löschen", deleteKlasse(3));
 
     ?>
 </table>
 <br>
 <h1>Fehlermeldungen</h1>
 <?php
-    foreach($GLOBALS['Errors'] as $Error){
+    foreach($_SESSION['Errors'] as $Error){
         echo $Error."<br>";
     }
 ?>
