@@ -76,18 +76,18 @@
 
   session_start();
   connect();
-  if(!$_SESSION['Errors'])
+  if(!isset($_SESSION['Errors']))
   	$_SESSION['Errors'] = array();
 
   /******************************************************
-             DATENBANK VERBINDUNGS FUNKTIONEN
+             DATENBANK VERBINDUNGSFUNKTIONEN
   ******************************************************/
 
   function connect(){
     $host = "localhost";
     $user = "root";
     $pass = "";
-    $database = "gia_car3";
+    $database = "gia_car";
     $con = mysqli_connect($host,$user,$pass,$database);
     if(mysqli_connect_errno()){
       errorHappend(mysqli_connect_error());
@@ -122,9 +122,9 @@
   ******************************************************/
   
   function createUser($Benutzername,$Passwort,$Email,$Vorname,$Nachname,$PLZ,$Adresse,$Job){
-	  $sql = "insert into tab_user(Benutzername,Passwort,email,Vorname,Nachname,plz,adresse,job)
-			values('".$Benutzername."','".password_hash($Passwort,PASSWORD_BCRYPT)."','".$Email."','".$Vorname."','".$Nachname."',
-			'".$PLZ."','".$Adresse."','".$Job."')";
+    $sql = "insert into tab_user(Benutzername,Passwort,email,Vorname,Nachname,plz,adresse,job)
+	      values('".$Benutzername."','".password_hash($Passwort,PASSWORD_BCRYPT)."','".$Email."','".$Vorname."','".$Nachname."',
+	      '".$PLZ."','".$Adresse."','".$Job."')";
     return sqlInsertOrUpdate($sql);
   }
   
@@ -258,6 +258,10 @@
     return selectSqlArray("tab_MotorArt","MotorNr,Motor","1","1","=");
   }
 
+  function getAutos(){
+    return getAllAutos();
+  }
+
   /******************************************************
                           DELETE
   ******************************************************/
@@ -288,6 +292,10 @@
 
   function deleteKlasse($KlassenNr){
     return deleteSql("tab_Klasse","KlassenNr",$KlassenNr);
+  }
+
+  function deleteWatchlist($Benutzername){
+    return deleteSql("tab_Watchlist","Benutzername",$Benutzername);
   }
 
   /******************************************************
@@ -377,6 +385,15 @@
     return true;
   }
 
+  function getAllAutos(){
+    $autos = convertTableToArray("select AutoNr from tab_Auto");
+    $autoList = array();
+    foreach ($autos as $key => $value) {
+      array_push($autoList,convertAutoToArray($value["Nr"]));
+    }
+    return $autoList;
+  }
+
   function convertAutoToArray($AutoNr){
   	$sql = "select * from convertAutoToArray where AutoNr = ".$AutoNr;
     $_AutoInformationen = sendToDatabase($sql);
@@ -463,6 +480,6 @@
 
   function selectSqlArray($table,$value,$whereKey,$whereValue,$comparer){
     $sql = "select ".$value." from ".$table." where ".$whereKey." ".$comparer." ".$whereValue;
-	  return convertTableToArray($sql);
+    return convertTableToArray($sql);
   }
 ?>
