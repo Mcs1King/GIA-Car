@@ -1,0 +1,26 @@
+\BOOKMARK [1][-]{section.1}{CONSTRAINTS}{}% 1
+\BOOKMARK [1][-]{section.2}{FOREIGN KEY}{}% 2
+\BOOKMARK [1][-]{section.3}{ALTER TABLE}{}% 3
+\BOOKMARK [1][-]{section.4}{AUTO INCREMENT}{}% 4
+\BOOKMARK [1][-]{section.5}{SELECT}{}% 5
+\BOOKMARK [1][-]{section.6}{JOIN}{}% 6
+\BOOKMARK [2][-]{subsection.6.1}{Inner Join}{section.6}% 7
+\BOOKMARK [2][-]{subsection.6.2}{Left Join}{section.6}% 8
+\BOOKMARK [2][-]{subsection.6.3}{Right Join}{section.6}% 9
+\BOOKMARK [2][-]{subsection.6.4}{Full Outer Join}{section.6}% 10
+\BOOKMARK [1][-]{section.7}{GROUP BY}{}% 11
+\BOOKMARK [1][-]{section.8}{LIKE}{}% 12
+\BOOKMARK [1][-]{section.9}{HAVING}{}% 13
+\BOOKMARK [1][-]{section.10}{VIEWS}{}% 14
+\BOOKMARK [1][-]{section.11}{ANOMALIEN}{}% 15
+\BOOKMARK [2][-]{subsection.11.1}{Einf\374geanomalie}{section.11}% 16
+\BOOKMARK [2][-]{subsection.11.2}{\304nderungsanomalie}{section.11}% 17
+\BOOKMARK [2][-]{subsection.11.3}{L\366schanomalie}{section.11}% 18
+\BOOKMARK [1][-]{section.12}{NORMALFORMEN}{}% 19
+\BOOKMARK [2][-]{subsection.12.1}{Erste Normalform}{section.12}% 20
+\BOOKMARK [2][-]{subsection.12.2}{Zweite Normalform}{section.12}% 21
+\BOOKMARK [2][-]{subsection.12.3}{Dritte Normalform}{section.12}% 22
+\BOOKMARK [1][-]{section.13}{MENGENOPERATIONEN}{}% 23
+\BOOKMARK [2][-]{subsection.13.1}{Union}{section.13}% 24
+\BOOKMARK [2][-]{subsection.13.2}{Intersect}{section.13}% 25
+\BOOKMARK [2][-]{subsection.13.3}{minus}{section.13}% 26

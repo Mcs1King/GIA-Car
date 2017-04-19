@@ -1,0 +1,28 @@
+\select@language {ngerman}
+\contentsline {section}{\numberline {1}CONSTRAINTS}{2}{section.1}
+\contentsline {section}{\numberline {2}FOREIGN KEY}{2}{section.2}
+\contentsline {section}{\numberline {3}ALTER TABLE}{2}{section.3}
+\contentsline {section}{\numberline {4}AUTO INCREMENT}{2}{section.4}
+\contentsline {section}{\numberline {5}SELECT}{3}{section.5}
+\contentsline {section}{\numberline {6}JOIN}{3}{section.6}
+\contentsline {subsection}{\numberline {6.1}Inner Join}{3}{subsection.6.1}
+\contentsline {subsection}{\numberline {6.2}Left Join}{3}{subsection.6.2}
+\contentsline {subsection}{\numberline {6.3}Right Join}{3}{subsection.6.3}
+\contentsline {subsection}{\numberline {6.4}Full Outer Join}{3}{subsection.6.4}
+\contentsline {section}{\numberline {7}GROUP BY}{3}{section.7}
+\contentsline {section}{\numberline {8}LIKE}{4}{section.8}
+\contentsline {section}{\numberline {9}HAVING}{4}{section.9}
+\contentsline {section}{\numberline {10}VIEWS}{4}{section.10}
+\contentsline {section}{\numberline {11}ANOMALIEN}{4}{section.11}
+\contentsline {subsection}{\numberline {11.1}Einf\IeC {\"u}geanomalie}{4}{subsection.11.1}
+\contentsline {subsection}{\numberline {11.2}\IeC {\"A}nderungsanomalie}{4}{subsection.11.2}
+\contentsline {subsection}{\numberline {11.3}L\IeC {\"o}schanomalie}{4}{subsection.11.3}
+\contentsline {section}{\numberline {12}NORMALFORMEN}{5}{section.12}
+\contentsline {subsection}{\numberline {12.1}Erste Normalform}{5}{subsection.12.1}
+\contentsline {subsection}{\numberline {12.2}Zweite Normalform}{5}{subsection.12.2}
+\contentsline {subsection}{\numberline {12.3}Dritte Normalform}{5}{subsection.12.3}
+\contentsline {section}{\numberline {13}MENGENOPERATIONEN}{5}{section.13}
+\contentsline {subsection}{\numberline {13.1}Union}{5}{subsection.13.1}
+\contentsline {subsection}{\numberline {13.2}Intersect}{5}{subsection.13.2}
+\contentsline {subsection}{\numberline {13.3}minus}{5}{subsection.13.3}
+\contentsfinish 
